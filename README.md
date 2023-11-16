@@ -2,7 +2,7 @@
 
 Tesla finally released OAuth2 support, and a slightly new API to replace the venerable, but unsafe Owner API. Now you can use this gem to authenticate users with their Tesla account, and be granted authorization to access the APIs.
 
-This library does not implement any client libraries for the Tesla Fleet API.
+This library does not implement any client libraries for the [Tesla Fleet API](https://developer.tesla.com/docs/fleet-api).
 
 ## Installation
 

@@ -2,8 +2,8 @@
 
 require "test_helper"
 
-class Omniauth::TestTesla < Minitest::Test
+class OmniAuth::TestTesla < Minitest::Test
   def test_that_it_has_a_version_number
-    refute_nil ::Omniauth::Tesla::VERSION
+    refute_nil ::OmniAuth::Tesla::VERSION
   end
 end

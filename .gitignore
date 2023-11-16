@@ -8,4 +8,4 @@
 /tmp/
 /TAGS
 logs/*.log
-*.sqlite
+**/*.sqlite3

@@ -4,7 +4,7 @@ require_relative "lib/omniauth-tesla/version"
 
 Gem::Specification.new do |spec|
   spec.name = "omniauth-tesla"
-  spec.version = Omniauth::Tesla::VERSION
+  spec.version = OmniAuth::Tesla::VERSION
   spec.authors = ["Dr Nic Williams"]
   spec.email = ["drnicwilliams@gmail.com"]
 
@@ -33,7 +33,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Uncomment to register a new dependency of your gem
-  spec.add_dependency "omniauth", "~> 1.0"
+  spec.add_dependency "omniauth", "~> 2.0"
+  spec.add_dependency "omniauth-oauth2", "~> 1.8"
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
