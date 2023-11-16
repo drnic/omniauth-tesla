@@ -7,6 +7,8 @@ gemfile(true) do
 
   gem "rails", "~> 7.1.0"
   gem "sqlite3"
+  gem "omniauth"
+  gem "omniauth-rails_csrf_protection", "~> 1.0"
   gem "omniauth-tesla", path: "../.."
 end
 
@@ -45,9 +47,7 @@ class App < Rails::Application
     root to: "welcome#index"
 
     post "/auth/:provider/callback" => "sessions#create"
-    get "/auth/:provider/callback" => "sessions#create"
     post "/signout" => "sessions#destroy", :as => :signout
-    get "/signout" => "sessions#destroy"
   end
 end
 
@@ -65,7 +65,7 @@ class WelcomeController < ActionController::Base
     @users_count = User.count
     render inline: <<-HTML
       <p>Hi! There are #{@users_count} users.</p>
-      <p><a href="/auth/tesla">Sign in with Tesla</a></p>
+      <%= button_to "Login with Tesla", "/auth/tesla" %>
     HTML
   end
 end
@@ -89,5 +89,7 @@ App.initialize!
 Rails.application.routes.routes.map do |route|
   {verb: route.verb, path: route.path.spec.to_s, controller: route.defaults[:controller], action: route.defaults[:action]}
 end.each { |route| p route }
+puts
+pp OmniAuth.strategies
 
 run App

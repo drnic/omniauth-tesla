@@ -25,6 +25,7 @@ module OmniAuth
       end
 
       def raw_info
+        pp access_token
         {
           email: "drnicwilliams@gmail.com"
         }
