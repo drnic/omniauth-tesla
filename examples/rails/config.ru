@@ -15,6 +15,9 @@ require "rails/all"
 require_relative "../../lib/omniauth-tesla"
 database = "development.sqlite3"
 
+tesla_client_id = ENV.fetch("TESLA_CLIENT_ID")
+tesla_client_secret = ENV.fetch("TESLA_CLIENT_SECRET")
+
 ENV["DATABASE_URL"] = "sqlite3:#{database}"
 ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: database)
 ActiveRecord::Base.logger = Logger.new($stdout)
@@ -40,7 +43,8 @@ class App < Rails::Application
 end
 
 Rails.application.config.middleware.use OmniAuth::Builder do
-  provider :tesla, "API_KEY", "API_SECRET"
+  # Scopes https://developer.tesla.com/docs/fleet-api#authorization-scopes
+  provider :tesla, tesla_client_id, tesla_client_secret, scope: "openid offline_access vehicle_device_data vehicle_cmds vehicle_charging_cmds"
 end
 
 class User < ActiveRecord::Base

@@ -9,3 +9,4 @@
 /TAGS
 logs/*.log
 **/*.sqlite3
+.env*

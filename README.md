@@ -12,11 +12,27 @@ bundle add omniauth-tesla
 
 ## Usage
 
+### Scopes
+
+You can specify the set of scopes for which your end users will grant you authorisation:
+
+```ruby
+use OmniAuth::Builder do
+  provider :tesla, ENV["TESLA_CLIENT_ID"], ENV["TESLA_CLIENT_SECRET"],
+    scope: "openid offline_access vehicle_device_data vehicle_cmds vehicle_charging_cmds"
+end
+```
+
+[Authorization Scopes](https://developer.tesla.com/docs/fleet-api#authorization-scopes)
+
+## Example app
 To see it in action, there is a single file Rails app at [`examples/rails/config.ru`](./examples/rails/config.ru).
 
 To run it:
 
 ```plain
+export TESLA_CLIENT_ID=...
+export TESLA_CLIENT_SECRET=...
 ( cd examples/rails; rackup )
 ```
 
