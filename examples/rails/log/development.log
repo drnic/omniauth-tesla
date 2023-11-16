@@ -1,0 +1,34 @@
+Started GET "/" for ::1 at 2023-11-16 16:06:12 +1000
+Processing by WelcomeController#index as HTML
+  Rendering inline template
+  Rendered inline template (Duration: 0.1ms | Allocations: 159)
+Completed 200 OK in 5ms (Views: 3.0ms | ActiveRecord: 0.0ms | Allocations: 3227)
+
+
+Started GET "/favicon.ico" for ::1 at 2023-11-16 16:06:12 +1000
+  
+ActionController::RoutingError (No route matches [GET] "/favicon.ico"):
+  
+Started GET "/" for ::1 at 2023-11-16 16:09:44 +1000
+Processing by WelcomeController#index as HTML
+  Rendering inline template
+  Rendered inline template (Duration: 0.3ms | Allocations: 159)
+Completed 200 OK in 8ms (Views: 4.7ms | ActiveRecord: 0.0ms | Allocations: 3227)
+
+
+Started GET "/" for ::1 at 2023-11-16 16:10:21 +1000
+Processing by WelcomeController#index as HTML
+Completed 500 Internal Server Error in 2ms (ActiveRecord: 0.0ms | Allocations: 1232)
+
+
+  
+NameError (uninitialized constant WelcomeController::User):
+  
+config.ru:40:in `index'
+Started GET "/" for ::1 at 2023-11-16 16:10:44 +1000
+Processing by WelcomeController#index as HTML
+  Rendering inline template
+  Rendered inline template (Duration: 0.2ms | Allocations: 161)
+Completed 200 OK in 15ms (Views: 3.3ms | ActiveRecord: 2.0ms | Allocations: 6572)
+
+
