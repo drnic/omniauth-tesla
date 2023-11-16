@@ -13,6 +13,22 @@ module OmniAuth
         authorize_url: "https://auth.tesla.com/oauth2/v3/authorize",
         token_url: "https://auth.tesla.com/oauth2/v3/token"
       }
+
+      uid do
+        raw_info.dig(:email)
+      end
+
+      info do
+        options.fields.each_with_object({}) do |field, hash|
+          hash[field] = request.params[field.to_s]
+        end
+      end
+
+      def raw_info
+        {
+          email: "drnicwilliams@gmail.com"
+        }
+      end
     end
   end
 end

@@ -10,7 +10,10 @@ gemfile(true) do
   gem "omniauth-tesla", path: "../.."
 end
 
-require "rails/all"
+require "active_record/railtie"
+require "action_controller/railtie"
+require "action_view/railtie"
+
 # load omniauth-tesla from root of project
 require_relative "../../lib/omniauth-tesla"
 database = "development.sqlite3"
@@ -35,10 +38,14 @@ class App < Rails::Application
   config.root = __dir__
   config.consider_all_requests_local = true
   config.secret_key_base = "i_am_a_secret"
-  config.active_storage.service_configurations = {"local" => {"service" => "Disk", "root" => "./storage"}}
 
   routes.append do
     root to: "welcome#index"
+
+    post "/auth/:provider/callback" => "sessions#create"
+    get "/auth/:provider/callback" => "sessions#create"
+    post "/signout" => "sessions#destroy", :as => :signout
+    get "/signout" => "sessions#destroy"
   end
 end
 
@@ -53,10 +60,31 @@ end
 class WelcomeController < ActionController::Base
   def index
     @users_count = User.count
-    render inline: "Hi! There are #{@users_count} users."
+    render inline: <<-HTML
+      <p>Hi! There are #{@users_count} users.</p>
+      <p><a href="/auth/tesla">Sign in with Tesla</a></p>
+    HTML
+  end
+end
+
+class SessionsController < ActionController::Base
+  def create
+    auth = request.env["omniauth.auth"]
+    user = User.find_by_provider_and_uid(auth["provider"], auth["uid"]) || User.create_with_omniauth(auth)
+    session[:user_id] = user.id
+    redirect_to root_url, notice: "Signed in!"
+  end
+
+  def destroy
+    session[:user_id] = nil
+    redirect_to root_url, notice: "Signed out!"
   end
 end
 
 App.initialize!
+
+Rails.application.routes.routes.map do |route|
+  {verb: route.verb, path: route.path.spec.to_s, controller: route.defaults[:controller], action: route.defaults[:action]}
+end.each { |route| p route }
 
 run App
