@@ -8,6 +8,6 @@
 /tmp/
 /TAGS
 *.log
-**/*.sqlite3
+**/*.sqlite3*
 .env*
 *.pem
