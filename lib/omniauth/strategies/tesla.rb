@@ -11,11 +11,15 @@ module OmniAuth
       option :client_options, {
         site: "https://fleet-api.prd.na.vn.cloud.tesla.com/api/#{DEFAULT_API_VERSION}",
         authorize_url: "https://auth.tesla.com/oauth2/v3/authorize",
-        token_url: "https://auth.tesla.com/oauth2/v3/token"
+        token_url: "https://auth.tesla.com/oauth2/v3/token",
+        auth_scheme: :request_body
       }
       option :authorize_params, {
         locale: "en-US",
         prompt: "login"
+      }
+      option :token_params, {
+        audience: "https://fleet-api.prd.na.vn.cloud.tesla.com" # TODO: config
       }
 
       # locale=en-US&prompt=login
