@@ -52,7 +52,8 @@ end
 Rails.application.config.middleware.use OmniAuth::Builder do
   # Scopes https://developer.tesla.com/docs/fleet-api#authorization-scopes
   provider :tesla, ENV.fetch("TESLA_CLIENT_ID"), ENV.fetch("TESLA_CLIENT_SECRET"),
-    scope: "openid offline_access vehicle_device_data vehicle_cmds vehicle_charging_cmds"
+    scope: "openid"
+  # scope: "openid%20offline_access%20vehicle_device_data%20vehicle_cmds%20vehicle_charging_cmds"
 end
 
 class User < ActiveRecord::Base

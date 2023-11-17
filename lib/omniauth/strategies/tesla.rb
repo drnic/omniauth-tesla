@@ -13,6 +13,13 @@ module OmniAuth
         authorize_url: "https://auth.tesla.com/oauth2/v3/authorize",
         token_url: "https://auth.tesla.com/oauth2/v3/token"
       }
+      option :authorize_params, {
+        locale: "en-US",
+        prompt: "login"
+      }
+
+      # locale=en-US&prompt=login
+      # encode "scope" spaces into %20
 
       uid do
         raw_info.dig(:email)
