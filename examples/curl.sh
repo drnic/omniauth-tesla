@@ -31,10 +31,18 @@ partner_auth_token=$(echo "$auth_response" | jq -r .access_token)
 echo "Access token is JWT that looks like:"
 echo "$partner_auth_token" | jwt decode -
 
-curl --header "Content-Type: application/json" \
+# openssl ecparam -name prime256v1 -genkey -noout -out private.pem
+# openssl ec -in private.pem -pubout -out com.tesla.3p.public-key.pem
+
+curl --header 'Content-Type: application/json' \
   --header "Authorization: Bearer $partner_auth_token" \
-  "${AUDIENCE}/api/1/users/me"
-echo
-curl --header "Content-Type: application/json" \
-  --header "Authorization: Bearer $partner_auth_token" \
-  "${AUDIENCE}/api/1/partner_accounts/public_key"
+  --data '{"domain":"http://localhost:9292"}' \
+  'https://fleet-api.prd.na.vn.cloud.tesla.com/api/1/partner_accounts'
+
+# curl --header "Content-Type: application/json" \
+#   --header "Authorization: Bearer $partner_auth_token" \
+#   "${AUDIENCE}/api/1/users/me"
+# echo
+# curl --header "Content-Type: application/json" \
+#   --header "Authorization: Bearer $partner_auth_token" \
+#   "${AUDIENCE}/api/1/partner_accounts/public_key"
