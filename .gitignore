@@ -11,3 +11,4 @@
 **/*.sqlite3*
 .env*
 *.pem
+access_token.txt
