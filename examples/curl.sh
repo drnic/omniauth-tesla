@@ -102,10 +102,16 @@ else
   echo "$access_token" >access_token.txt
 fi
 
-echo "curl ${AUDIENCE}/api/1/users/me"
-curl "${AUDIENCE}/api/1/users/me" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $(cat access_token.txt)"
+# Things that require user_data scope which isn't appearing in access token?!
+# echo "curl ${AUDIENCE}/api/1/users/me"
+# curl "${AUDIENCE}/api/1/users/me" \
+#   -H "Content-Type: application/json" \
+#   -H "Authorization: Bearer $(cat access_token.txt)"
+# echo "curl ${AUDIENCE}/api/1/vehicle_subscriptions"
+# curl -sS "${AUDIENCE}/api/1/vehicle_subscriptions" \
+#   -H "Content-Type: application/json" \
+#   -H "Authorization: Bearer $(cat access_token.txt)" |
+#   jq .
 
 echo
 echo "curl ${AUDIENCE}/api/1/vehicles"
@@ -127,6 +133,14 @@ curl -sS "${AUDIENCE}/api/1/vehicles/${vehicle_id}/vehicle_data?endpoints=charge
   -H "Authorization: Bearer $(cat access_token.txt)" |
   jq .
 curl -sS "${AUDIENCE}/api/1/vehicles/${vehicle_id}/vehicle_data?endpoints=vehicle_state" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $(cat access_token.txt)" |
+  jq .
+echo
+echo
+echo "Now let's try waking up a car"
+echo "curl -X POST ${AUDIENCE}/api/1/vehicles/${vehicle_id}/wake_up"
+curl -X POST "${AUDIENCE}/api/1/vehicles/${vehicle_id}/wake_up" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $(cat access_token.txt)" |
   jq .
