@@ -14,22 +14,16 @@ module OmniAuth
         token_url: "https://auth.tesla.com/oauth2/v3/token",
         auth_scheme: :request_body
       }
-      option :authorize_params, {
-        locale: "en-US",
-        prompt: "login"
-      }
       option :token_params, {
         audience: "https://fleet-api.prd.na.vn.cloud.tesla.com" # TODO: config
       }
-
-      # locale=en-US&prompt=login
-      # encode "scope" spaces into %20
 
       uid do
         raw_info.dig(:email)
       end
 
       info do
+        return {}
         options.fields.each_with_object({}) do |field, hash|
           hash[field] = request.params[field.to_s]
         end
@@ -40,6 +34,11 @@ module OmniAuth
         {
           email: "drnicwilliams@gmail.com"
         }
+      end
+
+      # Just vanillia callback path without query string
+      def callback_url
+        full_host + callback_path
       end
     end
   end

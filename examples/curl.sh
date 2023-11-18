@@ -9,7 +9,15 @@ set -eo pipefail
 : ${TESLA_CLIENT_SECRET:?required}
 AUDIENCE=${AUDIENCE:-https://fleet-api.prd.na.vn.cloud.tesla.com}
 : ${PUBLIC_TUNNEL_HOST:?required}
-scope="openid user_data vehicle_device_data vehicle_cmds vehicle_charging_cmds"
+scope="openid user_data offline_access vehicle_device_data vehicle_cmds vehicle_charging_cmds"
+state=${state:-123456781234}
+
+# Some scopes in developer.tesla.com own /authorize call:
+# offline_access+user+profile+ou_code+email
+# though it is using:
+# https://auth.tesla.com/en_au/oauth2/v1/authorize
+# instead of:
+# https://auth.tesla.com/oauth2/v3/authorize
 
 # if not jwt cli installed show error:
 if ! command -v jwt >/dev/null; then
@@ -60,7 +68,7 @@ else
   echo "NOTE: Now turn off the rackup rails server."
   echo
   echo "Visit this URL:"
-  echo "https://auth.tesla.com/oauth2/v3/authorize?client_id=${TESLA_CLIENT_ID}&redirect_uri=https%3A%2F%2Frails-9292.drnicwilliams.com%2Fauth%2Ftesla%2Fcallback&response_type=code&scope=openid%20user_data%20vehicle_device_data%20vehicle_cmds%20vehicle_charging_cmds&state=a4c509360a2cd8349bce6bf3a389f017292e24ee4d62c2e9"
+  echo "https://auth.tesla.com/oauth2/v3/authorize?client_id=${TESLA_CLIENT_ID}&redirect_uri=https%3A%2F%2Frails-9292.drnicwilliams.com%2Fauth%2Ftesla%2Fcallback&response_type=code&scope=openid%20user_data%20offline_access%20vehicle_device_data%20vehicle_cmds%20vehicle_charging_cmds&state=${state}"
   echo
   echo "When the auth sequence is finished and it fails to redirect to the callback URL"
   echo "since the app is not running, copy the code=XYZ from the URL and paste it here:"
@@ -87,33 +95,35 @@ else
   )
 
   access_token=$(echo "$token_response" | jq -r .access_token)
-  id_token=$(echo "$token_response" | jq -r .id_token)
+  # id_token=$(echo "$token_response" | jq -r .id_token)
 
-  echo "token_type: ${token_type}"
   echo "access_token: ${access_token}"
   echo $access_token | jwt decode -
-  echo
-
-  echo "id_token:"
-  echo $id_token | jwt decode -
   echo
 
   echo "Saving access_token to access_token.txt"
   echo "$access_token" >access_token.txt
 fi
 
-# Things that require user_data scope which isn't appearing in access token?!
-# echo "curl ${AUDIENCE}/api/1/users/me"
-# curl "${AUDIENCE}/api/1/users/me" \
-#   -H "Content-Type: application/json" \
-#   -H "Authorization: Bearer $(cat access_token.txt)"
+echo
+echo "curl https://auth.tesla.com/oauth2/v3/userinfo"
+curl https://auth.tesla.com/oauth2/v3/userinfo \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $(cat access_token.txt)"
+echo
+
+echo "Things that require user_data scope which isn't appearing in access token?!"
+echo "curl ${AUDIENCE}/api/1/users/me"
+curl "${AUDIENCE}/api/1/users/me" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $(cat access_token.txt)"
 # echo "curl ${AUDIENCE}/api/1/vehicle_subscriptions"
 # curl -sS "${AUDIENCE}/api/1/vehicle_subscriptions" \
 #   -H "Content-Type: application/json" \
 #   -H "Authorization: Bearer $(cat access_token.txt)" |
 #   jq .
+exit
 
-echo
 echo "curl ${AUDIENCE}/api/1/vehicles"
 vehicles=$(curl -sS "${AUDIENCE}/api/1/vehicles" \
   -H "Content-Type: application/json" \
