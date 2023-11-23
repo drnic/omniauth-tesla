@@ -23,17 +23,15 @@ module OmniAuth
       end
 
       info do
-        return {}
-        options.fields.each_with_object({}) do |field, hash|
-          hash[field] = request.params[field.to_s]
-        end
+        raw_info
       end
 
       def raw_info
-        pp access_token
         {
-          email: "drnicwilliams@gmail.com"
+          email: "drnicwilliams@gmail.com",
+          full_name: "Dr Nic Williams"
         }
+        # @raw_info ||= JSON.parse(access_token.get("/api/1/users/me").body)
       end
 
       # Just vanillia callback path without query string
@@ -45,3 +43,11 @@ module OmniAuth
 end
 
 OmniAuth.config.add_camelization "tesla", "Tesla"
+
+# client = OmniAuth::Strategies::Tesla.new(nil, OmniAuth::Strategies::Tesla.new(nil).options.client_options).client
+# token = OAuth2::AccessToken.new(client, File.read("access_token.txt"), refresh_token: File.read("refresh_token.txt"))
+# token.refresh(client_id: ENV["TESLA_CLIENT_ID"])
+# -> not working / not timing out
+#
+# JSON.parse(token.get("/api/1/vehicles").body)
+#

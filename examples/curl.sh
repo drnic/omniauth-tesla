@@ -9,7 +9,7 @@ set -eo pipefail
 : ${TESLA_CLIENT_SECRET:?required}
 AUDIENCE=${AUDIENCE:-https://fleet-api.prd.na.vn.cloud.tesla.com}
 : ${PUBLIC_TUNNEL_HOST:?required}
-scope="openid user_data offline_access vehicle_device_data vehicle_cmds vehicle_charging_cmds"
+scope="user user2 data userdata use_data i_made_this_up user_data profile ou_code email openid offline_access vehicle_device_data vehicle_cmds vehicle_charging_cmds"
 state=${state:-123456781234}
 
 # Some scopes in developer.tesla.com own /authorize call:
@@ -25,9 +25,9 @@ if ! command -v jwt >/dev/null; then
   echo "brew install jwt-cli"
 fi
 
-# if access_token.txt doesn't exist then:
-if [[ -f access_token.txt ]]; then
-  echo "access_token.txt exists so using it"
+# if refresh_token.txt doesn't exist then:
+if [[ -f refresh_token.txt ]]; then
+  echo "refresh_token.txt exists so using it"
   echo
 else
   # Generates a token to be used for managing a partner's account or devices they own.
@@ -68,7 +68,7 @@ else
   echo "NOTE: Now turn off the rackup rails server."
   echo
   echo "Visit this URL:"
-  echo "https://auth.tesla.com/oauth2/v3/authorize?client_id=${TESLA_CLIENT_ID}&redirect_uri=https%3A%2F%2Frails-9292.drnicwilliams.com%2Fauth%2Ftesla%2Fcallback&response_type=code&scope=openid%20user_data%20offline_access%20vehicle_device_data%20vehicle_cmds%20vehicle_charging_cmds&state=${state}"
+  echo "https://auth.tesla.com/oauth2/v3/authorize?client_id=${TESLA_CLIENT_ID}&redirect_uri=https%3A%2F%2F${PUBLIC_TUNNEL_HOST}%2Fauth%2Ftesla%2Fcallback&response_type=code&scope=${scope// /+}&state=${state}"
   echo
   echo "When the auth sequence is finished and it fails to redirect to the callback URL"
   echo "since the app is not running, copy the code=XYZ from the URL and paste it here:"
@@ -94,35 +94,65 @@ else
           }')"
   )
 
+  echo "/token response:"
+  echo "$token_response" | jq -r .
+  echo
+
   access_token=$(echo "$token_response" | jq -r .access_token)
-  # id_token=$(echo "$token_response" | jq -r .id_token)
+  refresh_token=$(echo "$token_response" | jq -r .refresh_token)
 
   echo "access_token: ${access_token}"
   echo $access_token | jwt decode -
   echo
 
+  echo "refresh_token: ${refresh_token}"
+  echo $refresh_token | jwt decode -
+  echo
+
   echo "Saving access_token to access_token.txt"
   echo "$access_token" >access_token.txt
+
+  echo "Saving refresh_token to refresh_token.txt"
+  echo "$refresh_token" >refresh_token.txt
 fi
 
 echo
-echo "curl https://auth.tesla.com/oauth2/v3/userinfo"
-curl https://auth.tesla.com/oauth2/v3/userinfo \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $(cat access_token.txt)"
+echo "Refreshing access token:"
+response=$(
+  curl -sS https://auth.tesla.com/oauth2/v3/token \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    --data-urlencode "grant_type=refresh_token" \
+    --data-urlencode "client_id=${TESLA_CLIENT_ID}" \
+    --data-urlencode "refresh_token=$(cat refresh_token.txt)"
+)
+echo "Saving access_token to access_token.txt"
+echo "$response" | jq -r .access_token >access_token.txt
 echo
 
+echo "Requested scopes: ${scope}"
+echo "Scopes in access token:"
+# cat refresh_token.txt | jwt decode --json - | jq -r .
+# cat access_token.txt | jwt decode --json - | jq -r .
+cat access_token.txt | jwt decode --json - | jq -r .payload.scp
+
+# echo
+# echo "curl https://auth.tesla.com/oauth2/v3/userinfo"
+# curl -sS https://auth.tesla.com/oauth2/v3/userinfo \
+#   -H "Content-Type: application/json" \
+#   -H "Authorization: Bearer $(cat access_token.txt)"
+# echo
+echo
 echo "Things that require user_data scope which isn't appearing in access token?!"
 echo "curl ${AUDIENCE}/api/1/users/me"
 curl "${AUDIENCE}/api/1/users/me" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $(cat access_token.txt)"
+exit
 # echo "curl ${AUDIENCE}/api/1/vehicle_subscriptions"
 # curl -sS "${AUDIENCE}/api/1/vehicle_subscriptions" \
 #   -H "Content-Type: application/json" \
 #   -H "Authorization: Bearer $(cat access_token.txt)" |
 #   jq .
-exit
 
 echo "curl ${AUDIENCE}/api/1/vehicles"
 vehicles=$(curl -sS "${AUDIENCE}/api/1/vehicles" \
