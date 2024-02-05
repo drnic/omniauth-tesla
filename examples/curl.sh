@@ -106,7 +106,8 @@ else
   echo
 
   echo "refresh_token: ${refresh_token}"
-  echo $refresh_token | jwt decode -
+  # refresh token is no longer a JWT apparently
+  # echo $refresh_token | jwt decode -
   echo
 
   echo "Saving access_token to access_token.txt"
