@@ -26,6 +26,7 @@ end
 [Authorization Scopes](https://developer.tesla.com/docs/fleet-api#authorization-scopes)
 
 ## Example app
+
 To see it in action, there is a single file Rails app at [`examples/rails/config.ru`](./examples/rails/config.ru).
 
 To run it:
@@ -33,7 +34,7 @@ To run it:
 ```plain
 export TESLA_CLIENT_ID=...
 export TESLA_CLIENT_SECRET=...
-( cd examples/rails; bundle; bundle exec rackup )
+( cd examples/rails; bundle exec rackup )
 ```
 
 Then visit <http://localhost:9292>.
@@ -46,7 +47,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/drnic/omniauth-tesla. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/drnic/omniauth-tesla/blob/develop/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at <https://github.com/drnic/omniauth-tesla>. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/drnic/omniauth-tesla/blob/develop/CODE_OF_CONDUCT.md).
 
 ## License
 

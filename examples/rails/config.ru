@@ -45,7 +45,7 @@ class App < Rails::Application
   routes.append do
     root to: "welcome#index"
 
-    post "/auth/:provider/callback" => "sessions#create"
+    get "/auth/:provider/callback" => "sessions#create"
     post "/signout" => "sessions#destroy", :as => :signout
   end
 end
@@ -65,7 +65,12 @@ class WelcomeController < ActionController::Base
     @users_count = User.count
     render inline: <<-HTML
       <p>Hi! There are #{@users_count} users.</p>
-      <%= button_to "Login with Tesla", "/auth/tesla" %>
+      <% if session[:user_id] %>
+        <p>Signed in as <%= User.find(session[:user_id]).email %></p>
+        <%= button_to "Logout", "/signout" %>
+      <% else %>
+        <%= button_to "Login with Tesla", "/auth/tesla" %>
+      <% end %>
     HTML
   end
 end
@@ -73,14 +78,20 @@ end
 class SessionsController < ActionController::Base
   def create
     auth = request.env["omniauth.auth"]
-    user = User.find_by_provider_and_uid(auth["provider"], auth["uid"]) || User.create_with_omniauth(auth)
+    pp auth
+    user = User.find_or_create_by(email: auth["uid"]) do |user|
+      user.email = auth["uid"]
+      user.full_name = auth["info"]["full_name"]
+    end
+    user.refresh_token = auth["credentials"]["token"]
+    user.save!
     session[:user_id] = user.id
-    redirect_to root_url, notice: "Signed in!"
+    redirect_to "/", notice: "Signed in!"
   end
 
   def destroy
     session[:user_id] = nil
-    redirect_to root_url, notice: "Signed out!"
+    redirect_to "/", notice: "Signed out!"
   end
 end
 
