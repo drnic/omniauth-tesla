@@ -33,7 +33,7 @@ To run it:
 ```plain
 export TESLA_CLIENT_ID=...
 export TESLA_CLIENT_SECRET=...
-( cd examples/rails; bundle; rackup )
+( cd examples/rails; bundle; bundle exec rackup )
 ```
 
 Then visit <http://localhost:9292>.

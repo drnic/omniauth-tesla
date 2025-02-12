@@ -5,7 +5,8 @@ require "bundler/inline"
 gemfile(true) do
   source "https://rubygems.org"
 
-  gem "rails", "~> 7.1.0"
+  gem "rails", "~> 7.2.0"
+  gem "puma"
   gem "sqlite3"
   gem "omniauth"
   gem "omniauth-rails_csrf_protection", "~> 1.0"
