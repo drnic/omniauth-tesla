@@ -62,11 +62,12 @@ end
 
 class WelcomeController < ActionController::Base
   def index
+    @user = User.find(session[:user_id]) if session[:user_id]
     @users_count = User.count
     render inline: <<-HTML
       <p>Hi! There are #{@users_count} users.</p>
-      <% if session[:user_id] %>
-        <p>Signed in as <%= User.find(session[:user_id]).email %></p>
+      <% if @user %>
+        <p>Signed in as <%= @user.email %></p>
         <%= button_to "Logout", "/signout" %>
       <% else %>
         <%= button_to "Login with Tesla", "/auth/tesla" %>
